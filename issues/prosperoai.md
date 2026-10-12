@@ -32,4 +32,9 @@ Things to note:
   FP16, ~550 GB/s read bandwidth. INT8 `v_dot4` returns 0 for every input on the
   Pro, so the driver is right to keep it off.
 
+Measured in ProsperoAI 01.005.000 itself (only param.json changed): your log shows
+`Vulkan memory: reported ... total=13555990528 bytes` (12.63 GiB), speed unchanged at
+86.9 tok/s for Mistral 7B Q4_0. Details: docs/prosperoai-results.md in the repo.
+Also, `/api/tags` returned a garbled model name on my console (the chat page works).
+
 Happy to open a PR for the param.json and lint change if you want it.

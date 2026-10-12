@@ -47,14 +47,9 @@ See [pro-memory-mode.md](pro-memory-mode.md).
 | `shaderIntegerDotProduct` | supported, but not accelerated: the driver runs it as ordinary integer math (see [int8-dot4.md](int8-dot4.md)) |
 | `VK_KHR_cooperative_matrix` | not exposed (RDNA2-class GPUs have no matrix cores for it) |
 
-## What it means for local LLMs (estimates)
+## What it means for local LLMs (measured)
 
-These are estimates, not measurements. ProsperoAI's published base PS5 figure
-for Mistral 7B Q4_0 is 69.7 tokens/s.
-
-- **Token generation** is limited by bandwidth: about 550 / 448 ≈ 1.25× the base
-  PS5. Expect roughly 85–90 tokens/s for Mistral 7B Q4_0 on the Pro.
-- **Prompt processing** is limited by compute: 60 vs 36 compute units at higher
-  clocks. Expect roughly 1.6–1.7× the base PS5.
-- **Model size**: with Pro memory mode, models and KV cache up to ~11–12 GiB
-  together.
+Measured with ProsperoAI and Mistral 7B Q4_0: **86.9 tokens/s** generation on
+the PS5 Pro against ProsperoAI's published 69.7 tokens/s on a base PS5 (1.25×,
+the bandwidth ratio), and ~692–725 tokens/s prompt reading. See
+[prosperoai-results.md](prosperoai-results.md).

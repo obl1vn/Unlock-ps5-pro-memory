@@ -73,6 +73,24 @@ allocation test: 12.50 GiB allocated and used, against 11.31 GiB before.
 
 The full write-up is in [docs/pro-memory-mode.md](docs/pro-memory-mode.md).
 
+## Tested in a real AI app: ProsperoAI
+
+With ProsperoAI 01.005.000 and Mistral 7B Q4_0 on a PS5 Pro
+([details](docs/prosperoai-results.md)):
+
+| | Memory for the app | Generation | Prompt reading |
+| --- | ---: | ---: | ---: |
+| Base PS5 (ProsperoAI's published result) | 11.44 GiB | 69.7 tok/s | – |
+| PS5 Pro, normal param.json | 11.44 GiB | 86.9 tok/s | 692 tok/s |
+| **PS5 Pro, Pro memory mode** | **12.63 GiB** | **86.9 tok/s** | **695 tok/s** |
+| PS5 Pro, Pro mode + batch 512 | 12.63 GiB | 86.9 tok/s | ~725 tok/s |
+
+- ProsperoAI's own log confirms the larger memory: `total=13555990528 bytes`
+  (12.63 GiB).
+- The Pro generates text **1.25× faster** than a base PS5, the same ratio as
+  its memory bandwidth.
+- The flag adds memory at **no speed cost**.
+
 ## Other results from the same probes
 
 Full numbers are in [docs/measurements.md](docs/measurements.md).
@@ -94,7 +112,9 @@ Full numbers are in [docs/measurements.md](docs/measurements.md).
 | [`docs/pro-memory-mode.md`](docs/pro-memory-mode.md) | The memory finding: method, evidence, open questions |
 | [`docs/measurements.md`](docs/measurements.md) | GPU compute, bandwidth and memory numbers on a PS5 Pro |
 | [`docs/int8-dot4.md`](docs/int8-dot4.md) | The INT8 dot-product experiment |
+| [`docs/prosperoai-results.md`](docs/prosperoai-results.md) | ProsperoAI speed and memory on a PS5 Pro, with settings |
 | [`docs/building.md`](docs/building.md) | How to build and run the probes yourself |
+| [`tools/prosperoai-bench.ps1`](tools/prosperoai-bench.ps1) | Windows script that measures ProsperoAI's speed over the network |
 | [`probes/`](probes/) | Probe app source: C, GLSL compute shaders, build scripts, driver patch |
 | [`issues/`](issues/) | The reports sent to ProsperoAI, Mihawk's PS5_Vulkan and psdevwiki |
 
