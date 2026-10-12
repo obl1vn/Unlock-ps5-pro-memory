@@ -1,0 +1,24 @@
+#version 450
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Probe 2d: packed FP16 throughput. Same shape as alu.comp, but each value is a
+// pair of 16-bit floats (f16vec2), which RDNA processes in one packed
+// instruction (v_pk_fma_f16): twice the FP32 rate on paper. FLOPs = 2 * 2 * 8 *
+// p0 * threads. AI kernels in FP16 (and llama.cpp's FP16 paths) run at this rate.
+#extension GL_EXT_shader_explicit_arithmetic_types_float16 : require
+layout(local_size_x = 256) in;
+layout(std430, binding = 1) buffer Out { float o[]; };
+layout(push_constant) uniform P { uint p0, p1, p2, p3; } pc;
+
+void main()
+{
+    float16_t s = float16_t(float(gl_GlobalInvocationID.x & 1023u) * 1.0e-4);
+    f16vec2 a = f16vec2(s, s + 0.05hf), b = a + 0.1hf, c = a + 0.2hf, d = a + 0.3hf;
+    f16vec2 e = a + 0.4hf, f = a + 0.5hf, g = a + 0.6hf, h = a + 0.7hf;
+    const f16vec2 m = f16vec2(0.999hf), k = f16vec2(0.001hf);
+    for (uint i = 0u; i < pc.p0; ++i) {
+        a = fma(a, m, k); b = fma(b, m, k); c = fma(c, m, k); d = fma(d, m, k);
+        e = fma(e, m, k); f = fma(f, m, k); g = fma(g, m, k); h = fma(h, m, k);
+    }
+    f16vec2 r = a + b + c + d + e + f + g + h;
+    if (r.x == -1.0hf) o[gl_GlobalInvocationID.x & 0xFFFFFu] = float(r.x + r.y);
+}

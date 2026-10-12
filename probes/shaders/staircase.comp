@@ -1,0 +1,29 @@
+#version 450
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Probe 2c: how many compute units actually take work.
+// Each workgroup claims a large slice of shared memory (LDS), so the GPU can
+// hold only about one of them per compute unit at a time. Timing a sweep of
+// workgroup counts gives a staircase: flat until every CU is busy, then a step.
+// The first step sits at the number of workgroups the GPU runs at once.
+layout(local_size_x = 64) in;
+layout(constant_id = 0) const int LDS_WORDS = 16384;
+shared uint lds[LDS_WORDS];
+layout(std430, binding = 1) buffer Out { uint o[]; };
+layout(push_constant) uniform P { uint p0, p1, p2, p3; } pc;
+
+void main()
+{
+    uint id = gl_LocalInvocationIndex;
+    // Touch the whole array so the compiler must allocate all of it.
+    for (uint i = id; i < uint(LDS_WORDS); i += 64u) lds[i] = i ^ pc.p1;
+    barrier();
+    float a = float(lds[(id * 997u + pc.p1) % uint(LDS_WORDS)]) * 1.0e-9;
+    float b = a + 0.1, c = a + 0.2, d = a + 0.3;
+    const float m = 0.9999, k = 0.0001;
+    for (uint i = 0u; i < pc.p0; ++i) {
+        a = fma(a, m, k); b = fma(b, m, k); c = fma(c, m, k); d = fma(d, m, k);
+    }
+    barrier();
+    uint r = floatBitsToUint(a + b + c + d) ^ lds[(id * 31u) % uint(LDS_WORDS)];
+    if (r == 0x9E3779B9u) o[gl_WorkGroupID.x & 0xFFFFFu] = r;
+}

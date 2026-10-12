@@ -1,0 +1,19 @@
+--- a/src/amd/vulkan/winsys/ps5/radv_ps5_winsys.c	2026-10-12 17:16:02.739246215 +0000
++++ b/src/amd/vulkan/winsys/ps5/radv_ps5_winsys.c	2026-10-12 17:16:02.785363674 +0000
+@@ -305,6 +305,16 @@
+    snprintf(info->marketing_name, sizeof(info->marketing_name), "PlayStation 5 GPU");
+    radv_ps5_take_gc_10_1_3_traits(info, compiler_compat_mode);
+ 
++   /* ps5-probes experiment: the base PS5's GPU computes v_dot4_u32_u8 wrong
++    * (above), so the model turns accelerated dot products off. The PS5 Pro's GPU
++    * is a different chip; RADV_PS5_DOT4=1 turns them back on so a test title can
++    * check its results and speed. Without the variable nothing changes. */
++   {
++      const char *dot4 = getenv("RADV_PS5_DOT4");
++      if (dot4 && dot4[0] == '1')
++         info->compiler_info.has_accelerated_dot_product = true;
++   }
++
+    /* What the platform, not the chip, rules out. */
+    /* Every wave of a shader using scratch_* instructions faulted (MEMVIOL) a
+     * few instructions in, where it had set FLAT_SCRATCH with s_setreg; the

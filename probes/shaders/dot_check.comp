@@ -1,0 +1,33 @@
+#version 450
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Probe 3a: is the INT8 dot product correct?
+// For each pair of packed 4x8-bit words, write four results:
+// manual unsigned, instruction unsigned, manual signed, instruction signed.
+// The host compares all four against a CPU reference.
+#extension GL_EXT_spirv_intrinsics : require
+spirv_instruction(extensions = ["SPV_KHR_integer_dot_product"], capabilities = [6019, 6018], id = 4451)
+uint udot4x8(uint a, uint b, spirv_literal int fmt);
+spirv_instruction(extensions = ["SPV_KHR_integer_dot_product"], capabilities = [6019, 6018], id = 4450)
+int sdot4x8(uint a, uint b, spirv_literal int fmt);
+
+layout(local_size_x = 256) in;
+layout(std430, binding = 0) readonly buffer In { uint v[]; };
+layout(std430, binding = 1) buffer Out { uint o[]; };
+layout(push_constant) uniform P { uint p0, p1, p2, p3; } pc;
+
+void main()
+{
+    uint i = gl_GlobalInvocationID.x;
+    if (i >= pc.p0) return;
+    uint a = v[2u * i], b = v[2u * i + 1u];
+    uint mu = 0u;
+    int ms = 0;
+    for (int k = 0; k < 4; ++k) {
+        mu += bitfieldExtract(a, 8 * k, 8) * bitfieldExtract(b, 8 * k, 8);
+        ms += bitfieldExtract(int(a), 8 * k, 8) * bitfieldExtract(int(b), 8 * k, 8);
+    }
+    o[4u * i + 0u] = mu;
+    o[4u * i + 1u] = udot4x8(a, b, 0);
+    o[4u * i + 2u] = uint(ms);
+    o[4u * i + 3u] = uint(sdot4x8(a, b, 0));
+}

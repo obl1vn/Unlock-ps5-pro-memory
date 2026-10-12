@@ -1,0 +1,23 @@
+#version 450
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Probe 2a: FP32 fused multiply-add throughput.
+// Each invocation runs 8 independent FMA chains for p0 iterations, so the
+// arithmetic units, not memory, limit the speed. FLOPs = 2 * 8 * p0 * threads.
+layout(local_size_x = 256) in;
+layout(std430, binding = 1) buffer Out { float o[]; };
+layout(push_constant) uniform P { uint p0, p1, p2, p3; } pc;
+
+void main()
+{
+    float s = float(gl_GlobalInvocationID.x) * 1.0e-7;
+    float a = s, b = s + 0.1, c = s + 0.2, d = s + 0.3;
+    float e = s + 0.4, f = s + 0.5, g = s + 0.6, h = s + 0.7;
+    const float m = 0.9999, k = 0.0001;
+    for (uint i = 0u; i < pc.p0; ++i) {
+        a = fma(a, m, k); b = fma(b, m, k); c = fma(c, m, k); d = fma(d, m, k);
+        e = fma(e, m, k); f = fma(f, m, k); g = fma(g, m, k); h = fma(h, m, k);
+    }
+    float r = a + b + c + d + e + f + g + h;
+    // Practically never true; keeps the loop live without a store per thread.
+    if (r == -1.0) o[gl_GlobalInvocationID.x & 0xFFFFFu] = r;
+}

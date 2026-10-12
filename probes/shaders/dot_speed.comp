@@ -1,0 +1,41 @@
+#version 450
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Probe 3b: INT8 dot product throughput, manual (MODE 0) vs instruction (MODE 1).
+// 8 independent chains per invocation, p0 iterations. Each 4x8 dot = 8 ops.
+// If the instruction path is several times faster, the hardware path is live;
+// if both match, the driver is emulating the instruction with ordinary math.
+#extension GL_EXT_spirv_intrinsics : require
+spirv_instruction(extensions = ["SPV_KHR_integer_dot_product"], capabilities = [6019, 6018], id = 4451)
+uint udot4x8(uint a, uint b, spirv_literal int fmt);
+
+layout(local_size_x = 256) in;
+layout(constant_id = 0) const int MODE = 0;
+layout(std430, binding = 1) buffer Out { uint o[]; };
+layout(push_constant) uniform P { uint p0, p1, p2, p3; } pc;
+
+uint manual_dot(uint a, uint b)
+{
+    return bitfieldExtract(a, 0, 8) * bitfieldExtract(b, 0, 8) +
+           bitfieldExtract(a, 8, 8) * bitfieldExtract(b, 8, 8) +
+           bitfieldExtract(a, 16, 8) * bitfieldExtract(b, 16, 8) +
+           bitfieldExtract(a, 24, 8) * bitfieldExtract(b, 24, 8);
+}
+
+uint step_dot(uint x, uint b)
+{
+    return (MODE == 1 ? udot4x8(x, b, 0) : manual_dot(x, b)) + x;
+}
+
+void main()
+{
+    uint g = gl_GlobalInvocationID.x;
+    uint b = pc.p1 | 0x01010101u;
+    uint x0 = g * 2654435761u, x1 = x0 ^ 0x1u, x2 = x0 ^ 0x22u, x3 = x0 ^ 0x333u;
+    uint x4 = x0 ^ 0x4444u, x5 = x0 ^ 0x55555u, x6 = x0 ^ 0x666666u, x7 = x0 ^ 0x7777777u;
+    for (uint i = 0u; i < pc.p0; ++i) {
+        x0 = step_dot(x0, b); x1 = step_dot(x1, b); x2 = step_dot(x2, b); x3 = step_dot(x3, b);
+        x4 = step_dot(x4, b); x5 = step_dot(x5, b); x6 = step_dot(x6, b); x7 = step_dot(x7, b);
+    }
+    uint r = x0 ^ x1 ^ x2 ^ x3 ^ x4 ^ x5 ^ x6 ^ x7;
+    if (r == 0x9E3779B9u) o[g & 0xFFFFFu] = r;
+}
