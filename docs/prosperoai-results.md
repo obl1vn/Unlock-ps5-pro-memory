@@ -67,3 +67,8 @@ desktop GPUs, so better-tuned kernels for this GPU could plausibly reach
 - The PS5 on-screen keyboard doesn't open in ProsperoAI here (the log shows
   `keyboard_handles=0` and `load_prx failed due to 0x00000063`). The browser
   interface at `http://<PS5-IP>:11434/` works instead.
+
+## Faster: ProsperoAI Pro
+
+With tuned llama.cpp settings and a quieter interface during generation, the same
+model reaches **96.6 tok/s** (prompt reading 740 tok/s). See [llm-tuning.md](llm-tuning.md).

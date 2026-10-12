@@ -1,0 +1,11 @@
+# ProsperoAI Pro settings. One KEY=VALUE per line; # starts a comment.
+# Read once at app start: change this file, then close and reopen the app.
+#
+# Mat-vec tuning measured on a PS5 Pro (FW 13.60): 94.0 -> 98.9 tok/s with Mistral 7B Q4_0.
+GGML_VK_PS5_DMMV_WG=1
+GGML_VK_PS5_DMMV_SUBGROUP=32
+#
+# Interface: sleep this many milliseconds after each frame while a generation runs,
+# so drawing the 1080p interface competes less with the model for the GPU.
+# 0 = draw at full rate like the original app.
+PROSPERO_UI_SLEEP_MS=50

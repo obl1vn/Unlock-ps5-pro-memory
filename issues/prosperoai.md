@@ -37,4 +37,17 @@ Measured in ProsperoAI 01.005.000 itself (only param.json changed): your log sho
 86.9 tok/s for Mistral 7B Q4_0. Details: docs/prosperoai-results.md in the repo.
 Also, `/api/tags` returned a garbled model name on my console (the chat page works).
 
+**Update: +11% generation speed.** With your release source, two small changes took
+Mistral 7B Q4_0 on the Pro from 86.9 to **96.6 tok/s** (prompt reading 692 -> 740):
+
+1. ggml-vulkan mat-vec: four waves per workgroup and wave32 on this GPU (+4.5%,
+   together with batch/ubatch 512). Added as opt-in environment switches.
+2. While a generation runs, the interface sleeps 50 ms after each frame (+6.4%).
+   Without it the full-HD redraw competes with inference for the GPU (bare llama.cpp
+   was ~8% faster than the app).
+
+Patches, measurements and a build script: docs/llm-tuning.md and llm-bench/ in the
+repo. I'd be glad to turn them into PRs (the interface change could also become a
+setting).
+
 Happy to open a PR for the param.json and lint change if you want it.

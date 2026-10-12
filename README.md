@@ -91,6 +91,32 @@ With ProsperoAI 01.005.000 and Mistral 7B Q4_0 on a PS5 Pro
   its memory bandwidth.
 - The flag adds memory at **no speed cost**.
 
+## ProsperoAI Pro: 11% faster text generation
+
+We then tuned llama.cpp's Vulkan shaders for this GPU and made ProsperoAI's
+interface step aside while the model writes ([details](docs/llm-tuning.md)):
+
+| Mistral 7B Q4_0 | Generation | Prompt reading |
+| --- | ---: | ---: |
+| Base PS5, stock ProsperoAI | 69.7 tok/s | – |
+| PS5 Pro, stock ProsperoAI | 86.9 tok/s | 692 tok/s |
+| **PS5 Pro, ProsperoAI Pro** | **96.6 tok/s** | **740 tok/s** |
+
+### Try it
+
+**ProsperoAI Pro** is our unofficial build of ProsperoAI with these changes plus Pro
+memory mode:
+
+- **Download:** [Releases of obl1vn/ProsperoAI](https://github.com/obl1vn/ProsperoAI/releases)
+  (install over the official app: same title ID `PPSA99004`).
+- **Source:** the [`ps5pro` branch of obl1vn/ProsperoAI](https://github.com/obl1vn/ProsperoAI/tree/ps5pro).
+- **Build it yourself:** [`llm-bench/build-prosperoai-pro.sh`](llm-bench/build-prosperoai-pro.sh).
+
+It is not made or supported by the ProsperoAI author. The two main changes are
+proposed upstream so every ProsperoAI user can get them:
+[#28 (quieter interface while generating)](https://github.com/blackbearreloaded/ProsperoAI/pull/28)
+and [#29 (llama.cpp Vulkan tuning switches)](https://github.com/blackbearreloaded/ProsperoAI/pull/29).
+
 ## Other results from the same probes
 
 Full numbers are in [docs/measurements.md](docs/measurements.md).
@@ -113,13 +139,15 @@ Full numbers are in [docs/measurements.md](docs/measurements.md).
 | [`docs/measurements.md`](docs/measurements.md) | GPU compute, bandwidth and memory numbers on a PS5 Pro |
 | [`docs/int8-dot4.md`](docs/int8-dot4.md) | The INT8 dot-product experiment |
 | [`docs/prosperoai-results.md`](docs/prosperoai-results.md) | ProsperoAI speed and memory on a PS5 Pro, with settings |
+| [`docs/llm-tuning.md`](docs/llm-tuning.md) | How llama.cpp was tuned for the PS5 Pro, with every measurement |
+| [`llm-bench/`](llm-bench/) | LLM test app, llama.cpp tuning patch, ProsperoAI Pro build |
 | [`docs/building.md`](docs/building.md) | How to build and run the probes yourself |
 | [`tools/prosperoai-bench.ps1`](tools/prosperoai-bench.ps1) | Windows script that measures ProsperoAI's speed over the network |
 | [`probes/`](probes/) | Probe app source: C, GLSL compute shaders, build scripts, driver patch |
 | [`issues/`](issues/) | The reports sent to ProsperoAI, Mihawk's PS5_Vulkan and psdevwiki |
 
 This repo contains only our own code and measurements. It contains no Sony
-code, no SDK files, no firmware, no game files and no binaries. To build the
+code, no SDK files, no firmware, no game files, no model weights and no binaries. To build the
 probes you need ProsperoAI's public toolchain (see
 [docs/building.md](docs/building.md)).
 
