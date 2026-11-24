@@ -98,8 +98,10 @@ please open an issue and we'll credit it.
   to give), but it could also be refused at launch.
 - **What else bit 22 changes.** It may switch on other Pro-mode settings
   besides memory. Our compute probes show all 60 compute units running homebrew
-  work without the bit, so it isn't needed for the GPU. We have not compared
-  clock speeds between the two modes.
+  work without the bit, so it isn't needed for the GPU. It does change the CPU
+  clock class: with bit 22 the kernel puts the app in its "Default" class
+  instead of a high-CPU-frequency one. Bit 27 restores the high class; see
+  [pro-high-cpu-clock.md](pro-high-cpu-clock.md).
 - **The other DDR5 memory.** The Pro's extra 2 GB of DDR5 is used by the system.
   We found no way for an app to allocate it directly.
 

@@ -51,6 +51,9 @@ new param.json. That's all.
   re-syncs) and has nothing to do with memory.
 - **On a base PS5** this is untested. A base PS5 has no extra memory to give,
   so expect no gain. Test carefully if you try it.
+- **Bit 22 also moves the app out of the high CPU clock class.** Add **bit 27**
+  (`0x8000000`) to keep the high clock as well: `139460608` (`0x8500000`). See
+  [docs/pro-high-cpu-clock.md](docs/pro-high-cpu-clock.md).
 
 ## How we found it
 
@@ -136,6 +139,7 @@ Full numbers are in [docs/measurements.md](docs/measurements.md).
 | Path | What it is |
 | --- | --- |
 | [`docs/pro-memory-mode.md`](docs/pro-memory-mode.md) | The memory finding: method, evidence, open questions |
+| [`docs/pro-high-cpu-clock.md`](docs/pro-high-cpu-clock.md) | Bit 27: the high CPU clock together with Pro memory |
 | [`docs/measurements.md`](docs/measurements.md) | GPU compute, bandwidth and memory numbers on a PS5 Pro |
 | [`docs/int8-dot4.md`](docs/int8-dot4.md) | The INT8 dot-product experiment |
 | [`docs/prosperoai-results.md`](docs/prosperoai-results.md) | ProsperoAI speed and memory on a PS5 Pro, with settings |
