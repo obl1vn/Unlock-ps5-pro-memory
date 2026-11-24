@@ -17,8 +17,10 @@ and the high CPU clock.
 (`0x40040` is the high-frame-rate output declaration. It is in every row and did
 not affect the class.)
 
-For an app that uses the README's `5242880` (`0x500000`), adding bit 27 gives
-**`139460608` (`0x8500000`)**.
+For an app that uses `5242880` (`0x500000`, bit 20 + bit 22), adding bit 27 gives
+**`139460608` (`0x8500000`)**. The scan and the measurements below used `0x8440040`
+(with the 120 Hz output bits instead of bit 20); the bits are independent in the
+scan, but `0x8500000` itself has not been run.
 
 ## What it changes
 
